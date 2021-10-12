@@ -10,16 +10,17 @@ const ejs=require("ejs");
 const session=require("express-session");
 const paht=require("path");
 const app= express();
+
+//mozda ne treba globalne varijable
 var ime;
 var aktivnost;
 var vreme;
 var napomena;
+
+
 app.use(upload());
-
-
 app.use(express.static("public"));
 app.set('view engine','ejs');
-
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(session({
   secret:"tajna",
@@ -27,13 +28,13 @@ app.use(session({
   saveUnintilazed:true
 }));
 
+
 app.get("/", function (req,res) {
  res.render("home")
 })
 
 
-//PROFESOR
-
+//PROFESOR - proveri da li je dobro oko sigurnosti da me ne zezaju ovi moji sa faksa da upadaju na server
 app.post('/auth', function(req, res) {
 	var username = req.body.usernameProf;
 	var password = req.body.passwordProf;
@@ -70,6 +71,7 @@ app.get("/profesor",function(req,res) {
       let studentInput=req.body.usernameStudent;
       var workbook=xlsx.readFile("uploads/proba.xlsx");
       let worksheet=workbook.Sheets[workbook.SheetNames[0]];
+  //ovde ako mozes stavi while petlju koja ide dok id nije null. nisam uspeo da se snadjem
       for (var i = 2; i < 96; i++) {
       const id=worksheet[`A${i}`].v;
       const ime=worksheet[`B${i}`].v;
@@ -79,20 +81,18 @@ app.get("/profesor",function(req,res) {
       const idSplit=id.split('/');
       indeks=idSplit.join('');
       if (studentInput==indeks) {
-        //ovde umesto log treba da ispise u isto prozoru dole za studenta , odnosno da ubaci u tabelu.
+//ovde umesto log treba da ispise u isto prozoru dole za studenta , odnosno da ubaci u tabelu.
        console.log({id:id, name:ime, aktivnost:aktivnost,vreme:vreme,napoena:napomena});
        }else {
-         //OVDE TREBA DA PISE U FRONTENDU STUDENT NEMA AKTIVNOSTI
+//ako nema aktivnost ime+"nema aktivnost" isto na toj strani student.
      }
     }
-
-
-
-
       });
 
 
 
+
+//ovde ako  nije nesto tesko ubaci da moze bilo koji fajl da se ubaci a ne samo proba.xlsx
 app.post("/osvezi",function (req,res) {
   if (req.files) {
     var file= req.files.file;
