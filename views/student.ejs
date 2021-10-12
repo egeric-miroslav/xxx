@@ -1,24 +1,34 @@
 <%- include('partials/header') %>
 <div class="jumbotron centered">
   <div class="container">
-        <img src="img/logo.png" alt="">
-        <p class="lead">Kriminalističko Policijski Univerzitet</p>
-        <hr>
+    <img src="img/logo.png" alt="">
+    <p class="lead">Kriminalističko Policijski Univerzitet</p>
+    <hr>
 
-  <table>
-  <tr>
-    <!---ovde sam probao nesto ali ne znam kako da povezem html i js preko node--->
-    <% for(var i = 0; i <10 ; i++){ %>
-      <th><%=%></th>
-      <th>Broj indeksa</th>
-      <th>Ime i prezime</th>
-      <th>Aktivnost</th>
-      <th>Vreme</th>
-      <th>Datum</th>
-      <th>Napomena</th>
-  </tr>
-</table>
-
-    </div>
+    <% if(aktivnosti && aktivnosti.length > 0) { %>
+    <table>
+      <tr>
+        <th><%= %></th>
+        <th>Broj indeksa</th>
+        <th>Ime i prezime</th>
+        <th>Aktivnost</th>
+        <th>Vreme</th>
+        <th>Napomena</th>
+      </tr>
+      <% for(var i = 0; i < aktivnosti.length; i++){ %>
+        <tr>
+          <th><%= %></th>
+          <th><%= aktivnosti[i].id %></th>
+          <th><%= aktivnosti[i].name %></th>
+          <th><%= aktivnosti[i].aktivnost %></th>
+          <th><%= aktivnosti[i].vreme %></th>
+          <th><%= aktivnosti[i].napomena %></th>
+        </tr>
+        <% } %>
+  </table>
+  <% } else { %>
+    <h2>Indeks nije pronadjen</h2>
+  <% } %>
   </div>
+</div>
 <%- include('partials/footer') %>

@@ -1,120 +1,127 @@
 require("dotenv").config();
-const { JSDOM } = require( "jsdom" );
-const { window } = new JSDOM( "" );
-const $ = require( "jquery" )( window );
-const express=require("express");
-const upload=require("express-fileupload");
-const xlsx= require("xlsx");
-const bodyParser=require("body-parser");
-const ejs=require("ejs");
-const session=require("express-session");
-const paht=require("path");
-const app= express();
-
-//mozda ne treba globalne varijable
-var ime;
-var aktivnost;
-var vreme;
-var napomena;
-
+const express = require("express");
+const upload = require("express-fileupload");
+const xlsx = require("xlsx");
+const bodyParser = require("body-parser");
+const session = require("express-session");
+const app = express();
 
 app.use(upload());
 app.use(express.static("public"));
-app.set('view engine','ejs');
-app.use(bodyParser.urlencoded({ extended: false }))
+app.set('view engine', 'ejs');
+app.use(bodyParser.urlencoded({
+  extended: false
+}))
 app.use(session({
-  secret:"tajna",
-  resave:true,
-  saveUnintilazed:true
+  secret: "tajna",
+  resave: true,
+  saveUnintilazed: true
 }));
 
 
-app.get("/", function (req,res) {
- res.render("home")
+app.get("/", function (req, res) {
+  res.render("home")
 })
 
-
-//PROFESOR - proveri da li je dobro oko sigurnosti da me ne zezaju ovi moji sa faksa da upadaju na server
-app.post('/auth', function(req, res) {
-	var username = req.body.usernameProf;
-	var password = req.body.passwordProf;
-	if (username=="p" && password==process.env.PASS) {
-      req.session.loggedin = true;
-				req.session.username = username;
-				res.redirect('/profesor');
-	} else {
-		res.redirect("profesorLogin")
-		res.end();
-	}
+//PROFESOR
+app.post('/auth', function (req, res) {
+  var username = req.body.usernameProf;
+  var password = req.body.passwordProf;
+  if (username == "p" && password == process.env.PASS) {
+    req.session.loggedin = true;
+    req.session.username = username;
+    res.redirect('/profesor');
+  } else {
+    res.render("profesorLogin", { error: 'Pogresna lozinka ili korisnicko ime' })
+    res.end();
+  }
 });
 
-app.get("/profesorLogin",function(req,res) {
-  res.render("profesorLogin");
-  });
+app.get("/profesorLogin", function (req, res) {
+  res.render("profesorLogin", { error: null });
+});
 
-app.get("/profesor",function(req,res) {
+app.get("/profesor", function (req, res) {
   if (req.session.loggedin) {
-  		res.render("profesor");
-  	} else {
-  		res.render("profesorLogin");
-  	}
-  	res.end();
+    res.render("profesor");
+  } else {
+    res.render("profesorLogin");
+  }
+  res.end();
 });
 
 
 
 //STUDENT
-  app.get("/studentLogin",function (req,res) {
-    res.render("studentLogin");
-  })
-  app.post("/student",function(req,res) {
-      let studentInput=req.body.usernameStudent;
-      var workbook=xlsx.readFile("uploads/proba.xlsx");
-      let worksheet=workbook.Sheets[workbook.SheetNames[0]];
-  //ovde ako mozes stavi while petlju koja ide dok id nije null. nisam uspeo da se snadjem
-      for (var i = 2; i < 96; i++) {
-      const id=worksheet[`A${i}`].v;
-      const ime=worksheet[`B${i}`].v;
-      const aktivnost=worksheet[`C${i}`].v;
-      const vreme=worksheet[`D${i}`].v;
-      const napomena=worksheet[`F${i}`].v;
-      const idSplit=id.split('/');
-      indeks=idSplit.join('');
-      if (studentInput==indeks) {
-//ovde umesto log treba da ispise u isto prozoru dole za studenta , odnosno da ubaci u tabelu.
-       console.log({id:id, name:ime, aktivnost:aktivnost,vreme:vreme,napoena:napomena});
-       }else {
-//ako nema aktivnost ime+"nema aktivnost" isto na toj strani student.
-     }
+app.get("/studentLogin", function (req, res) {
+  res.render("studentLogin");
+})
+
+app.post("/student", function (req, res) {
+  const id = req.body.usernameStudent
+  res.redirect('/student?id=' + id)
+})
+
+app.get("/student", function (req, res) {
+  let studentInput = req.query.id;
+  var workbook = xlsx.readFile("uploads/fajl.xlsx");
+  let worksheet = workbook.Sheets[workbook.SheetNames[0]];
+  const aktivnosti = []
+  for (var i = 2; worksheet[`A${i}`]; i++) {
+    const id = worksheet[`A${i}`].v;
+    const ime = worksheet[`B${i}`].v;
+    const aktivnost = worksheet[`C${i}`].v;
+    const vreme = worksheet[`D${i}`].v;
+    const napomena = worksheet[`F${i}`].v;
+    const idSplit = id.split('/');
+    indeks = idSplit.join('');
+    if (studentInput == indeks) {
+      aktivnosti.push({
+        id,
+        name: ime,
+        aktivnost,
+        vreme,
+        napomena
+      })
     }
-      });
+  }
+  res.render("student", { aktivnosti })
+});
 
-
-
-
-//ovde ako  nije nesto tesko ubaci da moze bilo koji fajl da se ubaci a ne samo proba.xlsx
-app.post("/osvezi",function (req,res) {
+app.post("/osvezi", function (req, res) {
+  if(req.session.loggedin) {
+    res.render("profesorLogin");
+    return;
+  }
   if (req.files) {
-    var file= req.files.file;
-    var fileName=file.name;
-    file.mv("./uploads/"+fileName,function (err) {
-      if(err){
-        res.send(err);
-      }else {
-        var workbook=xlsx.readFile("uploads/proba.xlsx");
-        let worksheet=workbook.Sheets[workbook.SheetNames[0]];
-        for (var i = 2; i < 10; i++) {
-        const indeks=worksheet[`A${i}`].v;
-        const ime=worksheet[`B${i}`].v;
-        const aktivnost=worksheet[`C${i}`].v;
-        const vreme=worksheet[`D${i}`].v;
-        const napomena=worksheet[`F${i}`].v;
-        console.log({id:indeks, name:ime, aktivnost:aktivnost,vreme:vreme,napoena:napomena});
-      }
+    var file = req.files.file;
+    var fileName = file.name;
+    file.mv("./uploads/fajl.xlsx", function (err) {
+      if (err) {
+        res.status(403).json({ success: false, error: err });
+      } else {
+        var workbook = xlsx.readFile(`uploads/fajl.xlsx`);
+        let worksheet = workbook.Sheets[workbook.SheetNames[0]];
+        for (var i = 2; worksheet[`A${i}`]; i++) {
+          const indeks = worksheet[`A${i}`].v;
+          const ime = worksheet[`B${i}`].v;
+          const aktivnost = worksheet[`C${i}`].v;
+          const vreme = worksheet[`D${i}`].v;
+          const napomena = worksheet[`F${i}`].v;
+          console.log({
+            id: indeks,
+            name: ime,
+            aktivnost: aktivnost,
+            vreme: vreme,
+            napoena: napomena
+          });
+        }
       }
     });
+    res.status(200).json({ success: true })
     console.log(fileName);
-  }});
+  }
+});
 
 
 app.listen(3000, (req, res) => {
