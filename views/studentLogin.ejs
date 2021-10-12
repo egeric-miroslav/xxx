@@ -1,0 +1,21 @@
+<%- include('partials/header') %>
+
+<div class="jumbotron centered">
+  <div class="container">
+    <img src="img/logo.png" alt="">
+    <p class="lead">Kriminalističko Policijski Univerzitet</p>
+    <hr>
+        <form class="login-student" action="/student" method="POST">
+          <div class="form-group">
+            <label style="student-label" for="email">Broj indeksa (primer:1b1002818)</label>
+            <input type="email" class="form-control" name="username">
+          </div>
+    
+          <button type="submit" class="btn btn-dark">Prijavi se</button>
+        </form>
+      </div>
+    </div>
+
+
+
+<%- include('partials/footer') %>

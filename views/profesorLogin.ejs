@@ -1,0 +1,22 @@
+<%- include('partials/header') %>
+
+<div class="jumbotron centered">
+  <div class="container">
+    <img src="img/logo.png" alt="">
+    <p class="lead">Kriminalističko Policijski Univerzitet</p>
+    <hr>
+        <form class="login-student" action="/auth" method="post">
+          <div class="form-group">
+            <label style="student-label" for="text">Korisničko ime</label>
+            <input type="text" class="form-control" name="usernameProf">
+          </div>
+          <div class="form-group">
+            <label for="password">Šifra</label>
+            <input type="password" class="form-control" name="passwordProf">
+          </div>
+          <button type="submit" class="btn btn-dark">Prijavi se</button>
+        </form>
+      </div>
+    </div>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,14 @@
+<%- include('partials/header') %>
+<div class="jumbotron centered">
+  <div class="container">
+        <img src="img/logo.png" alt="">
+        <p class="lead">Kriminalističko Policijski Univerzitet</p>
+        <hr>
+        <h3>Dodaj exel fajl</h3>
+        <form class="login-student" action="/osvezi" method="post" enctype="multipart/form-data">
+          <input type="file" name="file" value="">
+          <input type="submit" name="" value="upload">
+        </form>
+    </div>
+  </div>
+<%- include('partials/footer') %>

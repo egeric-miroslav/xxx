@@ -1,0 +1,23 @@
+<%- include('partials/header') %>
+<div class="jumbotron centered">
+  <div class="container">
+        <img src="img/logo.png" alt="">
+        <p class="lead">Kriminalističko Policijski Univerzitet</p>
+        <hr>
+
+  <table>
+  <tr>
+    <% for(var i = 0; i <10 ; i++){ %>
+      <th><%=indeks[i]%></th>
+      <th>Broj indeksa</th>
+      <th>Ime i prezime</th>
+      <th>Aktivnost</th>
+      <th>Vreme</th>
+      <th>Datum</th>
+      <th>Napomena</th>
+  </tr>
+</table>
+
+    </div>
+  </div>
+<%- include('partials/footer') %>

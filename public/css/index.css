@@ -1,0 +1,27 @@
+
+body {
+  background-color: #E8ECEF;
+}
+
+.centered {
+    padding-top: 120px;
+    text-align: center;
+}
+
+.secret-text {
+  text-align: center;
+  font-size: 2rem;
+  color: #fff;
+  background-color: #000;
+}
+
+.login-student{
+  margin: auto;
+  width: 50%;
+}
+table, th, td {
+    border: 1px solid black;
+}
+th, td {
+    padding: 10px;
+}
