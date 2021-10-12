@@ -10,6 +10,10 @@ const ejs=require("ejs");
 const session=require("express-session");
 const paht=require("path");
 const app= express();
+var ime;
+var aktivnost;
+var vreme;
+var napomena;
 app.use(upload());
 
 
@@ -63,19 +67,36 @@ app.get("/profesor",function(req,res) {
     res.render("studentLogin");
   })
   app.post("/student",function(req,res) {
-      res.render("student");
+      let studentInput=req.body.usernameStudent;
+      var workbook=xlsx.readFile("uploads/proba.xlsx");
+      let worksheet=workbook.Sheets[workbook.SheetNames[0]];
+      for (var i = 2; i < 96; i++) {
+      const id=worksheet[`A${i}`].v;
+      const ime=worksheet[`B${i}`].v;
+      const aktivnost=worksheet[`C${i}`].v;
+      const vreme=worksheet[`D${i}`].v;
+      const napomena=worksheet[`F${i}`].v;
+      const idSplit=id.split('/');
+      indeks=idSplit.join('');
+      if (studentInput==indeks) {
+        //ovde umesto log treba da ispise u isto prozoru dole za studenta , odnosno da ubaci u tabelu.
+       console.log({id:id, name:ime, aktivnost:aktivnost,vreme:vreme,napoena:napomena});
+       }else {
+         //OVDE TREBA DA PISE U FRONTENDU STUDENT NEMA AKTIVNOSTI
+     }
+    }
+
+
+
+
       });
-      app.get("/student",function(req,res) {
-          res.render("student");
-          });
+
 
 
 app.post("/osvezi",function (req,res) {
-
   if (req.files) {
     var file= req.files.file;
     var fileName=file.name;
-
     file.mv("./uploads/"+fileName,function (err) {
       if(err){
         res.send(err);
